@@ -52,7 +52,7 @@
   <!-- アセット管理 -->
   <a-assets>
     <img id="sky" src="kloppenheim_06_puresky_small.jpg">
-    <video id="movie" src="movie_test.mp4" loop="true" muted autoplay></video>
+    <video id="movie" src="movie_test.mp4" loop="true" autoplay></video>
     <a-asset-item id="dome" src="BOD_VR_Test2.glb"></a-asset-item>
   </a-assets>
 
@@ -98,7 +98,7 @@
 
   <!-- 動画スクリーン -->
   <a-plane
-    position="0 1.8 -4"
+    position="0 1 -4"
     width="3"
     height="1.7"
     material="src: #movie">
@@ -148,10 +148,12 @@
   }
 
   // 動画再生（スマホ対策）
+  /*
   document.body.addEventListener('click', () => {
     const video = document.getElementById('movie');
     video.play();
   }, { once: true });
+  */
 </script>
 
 </body>
