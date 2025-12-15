@@ -100,6 +100,21 @@
     material="src: #movie">
   </a-plane>
 
+  
+	<a-plane
+		id = "video-border"
+		width = "17" height = "10"
+		position = "0 5 -20"
+		color = "#440000"
+		video-controls>		
+		<a-video  
+			id = "video-display"
+			width="16" height="9" 
+			position="0 0 0.1"
+			src="#movie">
+		</a-video>
+	</a-plane>
+
   <!-- カメラリグ（円形移動制限） -->
   <a-entity id="rig" position="0 1.6 3">
     <a-camera
