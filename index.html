@@ -47,11 +47,12 @@
   <button onclick="move(0, 0.3)">↓</button>
 </div>
 
-<a-scene>
+<a-scene id="scene">
 
   <!-- アセット管理 -->
   <a-assets>
     <img id="sky" src="kloppenheim_06_puresky_small.jpg">
+    <video id="movie_main3" src="assets/VR_Video_MainScreen_Anim_NoAudio.mp4" loop autoplay></video>
     <video id="movie" src="assets/TEST-1.mp4" loop autoplay></video>
     <a-asset-item id="dome" src="assets/BOD_v3_Env.glb"></a-asset-item>
     <a-asset-item id="screen" src="assets/BOD_v3_Screen.glb"></a-asset-item>
@@ -71,7 +72,7 @@
     src="#screen"
     position="0 0.1 0"
     scale="2 2 2"
-	material="color: red">
+	material="src: #movie_main3">
   </a-gltf-model>
 
   <!-- パーティクル（六角形がゆっくり上昇） -->
@@ -114,21 +115,6 @@
     material="src: #movie">
   </a-plane>
 
-  <!--
-	<a-plane
-		id = "video-border"
-		width = "17" height = "10"
-		position = "0 5 -20"
-		color = "#440000"
-		video-controls>		
-		<a-video  
-			id = "video-display"
-			width="16" height="9" 
-			position="0 0 0.1"
-			src="#movie">
-		</a-video>
-	</a-plane>
-  -->
 
   <!-- カメラリグ（円形移動制限） -->
   <a-entity id="rig" position="0 -1.3 0">
@@ -157,13 +143,37 @@
     }
   }
 
-  // 動画再生（スマホ対策）
-  /*
-  document.body.addEventListener('click', () => {
-    const video = document.getElementById('movie');
-    video.play();
-  }, { once: true });
-  */
+
+	
+document.body.addEventListener('click', () => {
+  document.getElementById('movie').play();
+}, { once: true });
+
+const scene = document.getElementById('scene');
+
+scene.addEventListener('loaded', () => {
+  const model = document.querySelector('[gltf-model]');
+
+  model.addEventListener('model-loaded', () => {
+    const root = model.getObject3D('mesh');
+    const video = document.getElementById('movie_main3');
+
+    const videoTexture = new AFRAME.THREE.VideoTexture(video);
+    videoTexture.flipY = false;
+    videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
+    videoTexture.needsUpdate = true;
+
+    root.traverse(obj => {
+      if (obj.type === 'Mesh' && obj.name === 'Screen') {
+		obj.material.color.setRGB(1, 1, 1);   // ← 重要
+        obj.material.map = videoTexture;
+        obj.material.needsUpdate = true;
+
+        console.log('🎥 Video texture applied to:', obj.name);
+      }
+    });
+  });
+});
 </script>
 
 </body>
