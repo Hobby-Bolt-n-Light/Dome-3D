@@ -164,6 +164,7 @@ scene.addEventListener('loaded', () => {
     videoTexture.needsUpdate = true;
 
     root.traverse(obj => {
+	  console.log(obj.type, obj.name);
       if (obj.type === 'Mesh' && obj.name === 'Screen') {
 		obj.material.color.setRGB(1, 1, 1);   // ← 重要
         obj.material.map = videoTexture;
