@@ -185,7 +185,11 @@
 	<a-entity id="rig"
 		position="0 -1.3 0.5"
 		relative-move="speed: 0.03; radius: 1.5">
-			<a-camera look-controls></a-camera>
+			<a-camera
+				look-controls
+				raycaster="objects: .clickable"
+				cursor="rayOrigin: mouse">
+			</a-camera>
 	</a-entity>
 	
 
@@ -198,99 +202,113 @@
 	//***** 案内表示 *****
 	const intro = document.getElementById('intro');
 	intro.addEventListener('click', () => {
-	  intro.style.display = 'none';
-	  document.getElementById('movie').play();
-	  document.getElementById('movie_main3').play();
+	  	intro.style.display = 'none';
+	  	document.getElementById('movie').play();
+	  	document.getElementById('movie_main3').play();
 	});
 		
 	//***** 動画再生 *****
 	document.body.addEventListener('click', () => {
-	  console.log('Body clicked! : movie starts');
-	  document.getElementById('movie').play();
-	  document.getElementById('movie_main3').play();
+	  	console.log('Body clicked! : movie starts');
+	  	document.getElementById('movie').play();
+	  	document.getElementById('movie_main3').play();
 	}, { once: true });
 	
 	
 	//***** 動画貼り付け　＋　画像貼り付け *****
+	const screenEl = document.querySelector('a-gltf-model[src="#screen"]');
 	scene.addEventListener('loaded', () => {
-	  console.log('Data loaded');
-	  const model = document.querySelector('[gltf-model]');
-	
-	  model.addEventListener('model-loaded', () => {
-	    const root = model.getObject3D('mesh');
-	    const video = document.getElementById('movie_main3');
-	
-	    const videoTexture = new AFRAME.THREE.VideoTexture(video);
-	    videoTexture.flipY = false;
-	    videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
-	    videoTexture.needsUpdate = true;
-	
-	    root.traverse(obj => {
-		  console.log(obj.type, obj.name);
-	      if (obj.type === 'Mesh' && obj.name === 'Screen') {
-			console.log('Screen Found');
-			obj.material.color.setRGB(1, 1, 1);
-	        obj.material.map = videoTexture;
-			//obj.material.emissive.set(1,1,1);
-	        //obj.material.emissiveMap = videoTexture;
-	        obj.material.needsUpdate = true;
-	
-	        console.log('🎥 Video texture applied to:', obj.name);
-	      }
-	    });
+		console.log('Data loaded');
+		const model = document.querySelector('[gltf-model]');
+		
+		model.addEventListener('model-loaded', () => {
+			const root = model.getObject3D('mesh');
+			const video = document.getElementById('movie_main3');
+			
+			const videoTexture = new AFRAME.THREE.VideoTexture(video);
+			videoTexture.flipY = false;
+			videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
+			videoTexture.needsUpdate = true;
+			
+			root.traverse(obj => {
+				console.log(obj.type, obj.name);
+				if (obj.type === 'Mesh' && obj.name === 'Screen') {
+					console.log('Screen Found');
+					obj.material.color.setRGB(1, 1, 1);
+					obj.material.map = videoTexture;
+					//obj.material.emissive.set(1,1,1);
+					//obj.material.emissiveMap = videoTexture;
+					obj.material.needsUpdate = true;
+					
+					console.log('🎥 Video texture applied to:', obj.name);
+				}
+			});
 		  
-	  });
+		});
+		
+		const panelsEl = document.querySelector('a-gltf-model[src="#panels"]');
+		
+		panelsEl.addEventListener('model-loaded', () => {  
+			const panelsRoot = panelsEl.getObject3D('mesh');
+			if (!panelsRoot) return;
+			  
+			panelsRoot.traverse(obj => {
+				if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
+				
+				    console.log('Panel Found:', obj.name);
+				
+				    // --- テクスチャ ---
+				    const img = document.getElementById(
+				      obj.name.toLowerCase() + '-img'
+				    );
+				
+				    const tex = new THREE.Texture(img);
+				    tex.colorSpace = THREE.SRGBColorSpace;
+				    tex.needsUpdate = true;
+				
+				    obj.material.map = tex;
+				    obj.material.transparent = true;
+				    obj.material.needsUpdate = true;
+				
+				    // ===== ★ ワールド座標を保存 =====
+				    const worldPos = new THREE.Vector3();
+				    obj.getWorldPosition(worldPos);
+				
+				    const worldQuat = new THREE.Quaternion();
+				    obj.getWorldQuaternion(worldQuat);
+				
+				    // ===== entity 作成 =====
+				    const panelEl = document.createElement('a-entity');
+				
+				    // ★ 親から外す
+				    obj.parent.remove(obj);
+				
+				    // ★ entity に追加
+				    panelEl.object3D.add(obj);
+				
+				    // ★ ワールド座標を復元
+				    panelEl.object3D.position.copy(worldPos);
+				    panelEl.object3D.quaternion.copy(worldQuat);
+				
+				    // Mesh は entity 原点に
+				    obj.position.set(0, 0, 0);
+				    obj.rotation.set(0, 0, 0);
+				
+				    // コンポーネント
+				    panelEl.setAttribute('float-y', '');
+				    panelEl.setAttribute('panel-interaction', { id: obj.name });
+				
+				    // クリック対象
+				    panelEl.classList.add('clickable');
+				
+				    scene.appendChild(panelEl);
+				}
+			});
 
-	  const panelsEl = document.querySelector('a-gltf-model[src="#panels"]');
-
-	  panelsEl.addEventListener('model-loaded', () => {  
-	    const panelsRoot = panelsEl.getObject3D('mesh');
-	    if (!panelsRoot) return;
-		  
-		panelsRoot.traverse(obj => {
-			if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
-			
-			    console.log('Panel Found:', obj.name);
-			
-			    // 画像テクスチャ
-			    const img = document.getElementById(
-			      obj.name.toLowerCase() + '-img'
-			    );
-			
-			    const tex = new THREE.Texture(img);
-			    tex.colorSpace = THREE.SRGBColorSpace;
-			    tex.needsUpdate = true;
-			
-			    obj.material.map = tex;
-			    obj.material.transparent = true;
-			    obj.material.needsUpdate = true;
-			
-			    // ===== ★ここが核心 =====
-			
-			    // A-Frame Entity を作る
-			    const panelEl = document.createElement('a-entity');
-			
-			    // Panel Mesh を entity に移す
-			    panelEl.object3D.add(obj);
-			
-			    // 元の親からは外す
-			    panelsRoot.remove(obj);
-			
-			    // コンポーネント付与
-			    panelEl.setAttribute('float-y', '');
-			    panelEl.setAttribute('panel-interaction', {
-			      id: obj.name
-			    });
-			
-			    // Scene に追加
-			    scene.appendChild(panelEl);
-			  }
 		});
 
-	});
-
-	const loading = document.getElementById('loading');
-	loading.style.display = 'none';
+		const loading = document.getElementById('loading');
+		loading.style.display = 'none';
 	});
 
 	/*
