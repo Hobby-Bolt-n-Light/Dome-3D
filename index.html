@@ -148,18 +148,19 @@
   </a-gltf-model>
 	
   <a-gltf-model
-    src="#dome"
+    src="#panels"
     position="0 0 0"
 	rotation="0 -90 0"
     scale="2 2 2">
   </a-gltf-model>
 	
   <a-gltf-model
-    src="#panels"
+    src="#dome"
     position="0 0 0"
 	rotation="0 -90 0"
     scale="2 2 2">
   </a-gltf-model>
+	
 	
   <!-- 動画スクリーン -->
   <a-plane
@@ -202,6 +203,7 @@
 		
 	//***** 動画再生 *****
 	document.body.addEventListener('click', () => {
+	  console.log('Body clicked! : movie starts');
 	  document.getElementById('movie').play();
 	  document.getElementById('movie_main3').play();
 	}, { once: true });
@@ -209,6 +211,7 @@
 	
 	//***** 動画貼り付け　＋　画像貼り付け *****
 	scene.addEventListener('loaded', () => {
+	  console.log('Data loaded');
 	  const model = document.querySelector('[gltf-model]');
 	
 	  model.addEventListener('model-loaded', () => {
@@ -223,6 +226,7 @@
 	    root.traverse(obj => {
 		  console.log(obj.type, obj.name);
 	      if (obj.type === 'Mesh' && obj.name === 'Screen') {
+			console.log('Screen Found');
 			obj.material.color.setRGB(1, 1, 1);
 	        obj.material.map = videoTexture;
 			//obj.material.emissive.set(1,1,1);
@@ -234,6 +238,7 @@
 	    });
 		root.traverse(obj => {
 		  if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
+			console.log('Panel Found');
 		
 			// 画像割り当て
 			const img = document.getElementById(
@@ -346,6 +351,7 @@
 	  Panel6: '説明文6'
 	};
 	
+	//***** フワフワアニメーション *****
 	AFRAME.registerComponent('panel-interaction', {
 	  schema: { id: { type: 'string' } },
 	
