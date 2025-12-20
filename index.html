@@ -34,6 +34,19 @@
       font-size: 16px;
       opacity: 0.8;
     }
+	  
+	#intro {
+	  position: fixed;
+	  inset: 0;
+	  background: rgba(0,0,0,0.7);
+	  color: white;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  text-align: center;
+	  z-index: 20;
+	  font-size: 18px;
+	}
   </style>
 </head>
 
@@ -41,10 +54,25 @@
 
 <!-- UIボタン -->
 <div class="ui">
-  <button onclick="move(0, -0.3)">↑</button>
-  <button onclick="move(-0.3, 0)">←</button>
-  <button onclick="move(0.3, 0)">→</button>
-  <button onclick="move(0, 0.3)">↓</button>
+	<!--
+	<button onclick="move(0, -0.3)">↑</button>
+	<button onclick="move(-0.3, 0)">←</button>
+	<button onclick="move(0.3, 0)">→</button>
+	<button onclick="move(0, 0.3)">↓</button> 
+	-->
+	<button onmousedown="startMove(0, -1)" onmouseup="stopMove()">↑</button>
+	<button onmousedown="startMove(-1, 0)" onmouseup="stopMove()">←</button>
+	<button onmousedown="startMove(1, 0)" onmouseup="stopMove()">→</button>
+	<button onmousedown="startMove(0, 1)" onmouseup="stopMove()">↓</button>
+</div>
+
+
+
+<!-- 案内表示 -->
+<div id="intro">
+	<p>画面をドラッグして視点を移動できます<br>
+	 ボタンで移動できます<br>
+	 タップして開始</p>
 </div>
 
 <a-scene id="scene">
@@ -53,7 +81,8 @@
   <a-assets>
     <img id="sky" src="kloppenheim_06_puresky_small.jpg">
     <video id="movie_main3" src="assets/VR_Video_MainScreen_Anim_NoAudio.mp4" loop muted playsinline></video>
-    <video id="movie" src="assets/TEST-1.mp4" loop muted playsinline></video>
+    <vi
+		deo id="movie" src="assets/TEST-1.mp4" loop muted playsinline></video>
     <a-asset-item id="dome" src="assets/BOD_v5_Env.glb"></a-asset-item>
     <a-asset-item id="screen" src="assets/BOD_v4_Screen.glb"></a-asset-item>
   </a-assets>
@@ -98,6 +127,9 @@
 </a-scene>
 
 <script>
+	
+//***** 移動範囲制限 *****
+/*
   const rig = document.getElementById('rig');
   const radius = 1.5; // 円形移動範囲
 
@@ -113,42 +145,98 @@
       pos.z *= radius / dist;
     }
   }
+*/
 
+	const rig = document.getElementById('rig');
+	const camera = rig.querySelector('a-camera');
+	const speed = 0.02;
+	const radius = 1.5;
+	
+	let moveVec = { x: 0, z: 0 };
+	let moving = false;
+	
+	function startMove(x, z) {
+	  moveVec.x = x;
+	  moveVec.z = z;
+	  moving = true;
+	}
+	
+	function stopMove() {
+	  moving = false;
+	}
+	
+	function tick() {
+	  if (!moving) return;
+	
+	  const camObj = camera.object3D;
+	  const dir = new AFRAME.THREE.Vector3();
+	  camObj.getWorldDirection(dir);
+	  dir.y = 0;
+	  dir.normalize();
+	
+	  const right = new AFRAME.THREE.Vector3()
+	    .crossVectors(dir, new AFRAME.THREE.Vector3(0, 1, 0))
+	    .normalize();
+	
+	  const pos = rig.object3D.position;
+	
+	  pos.addScaledVector(dir, -moveVec.z * speed);
+	  pos.addScaledVector(right, moveVec.x * speed);
+	
+	  // 円形制限
+	  const d = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
+	  if (d > radius) {
+	    pos.multiplyScalar(radius / d);
+	  }
+	}
+	
+	scene.addEventListener('loaded', () => {
+	  scene.addEventListener('tick', tick);
+	});
 
 	
-document.body.addEventListener('click', () => {
-  document.getElementById('movie').play();
-  document.getElementById('movie_main3').play();
-}, { once: true });
-
-const scene = document.getElementById('scene');
-
-scene.addEventListener('loaded', () => {
-  const model = document.querySelector('[gltf-model]');
-
-  model.addEventListener('model-loaded', () => {
-    const root = model.getObject3D('mesh');
-    const video = document.getElementById('movie_main3');
-
-    const videoTexture = new AFRAME.THREE.VideoTexture(video);
-    videoTexture.flipY = false;
-    videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
-    videoTexture.needsUpdate = true;
-
-    root.traverse(obj => {
-	  console.log(obj.type, obj.name);
-      if (obj.type === 'Mesh' && obj.name === 'Screen') {
-		obj.material.color.setRGB(1, 1, 1);
-        obj.material.map = videoTexture;
-		obj.material.emissive.set(1,1,1);
-        obj.material.emissiveMap = videoTexture;
-        obj.material.needsUpdate = true;
-
-        console.log('🎥 Video texture applied to:', obj.name);
-      }
-    });
-  });
-});
+	//***** 案内表示 *****
+	const intro = document.getElementById('intro');
+	intro.addEventListener('click', () => {
+	  intro.style.display = 'none';
+	  document.getElementById('movie').play();
+	  document.getElementById('movie_main3').play();
+	});
+		
+	//***** 動画再生 *****
+	document.body.addEventListener('click', () => {
+	  document.getElementById('movie').play();
+	  document.getElementById('movie_main3').play();
+	}, { once: true });
+	
+	const scene = document.getElementById('scene');
+	
+	scene.addEventListener('loaded', () => {
+	  const model = document.querySelector('[gltf-model]');
+	
+	  model.addEventListener('model-loaded', () => {
+	    const root = model.getObject3D('mesh');
+	    const video = document.getElementById('movie_main3');
+	
+	    const videoTexture = new AFRAME.THREE.VideoTexture(video);
+	    videoTexture.flipY = false;
+	    videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
+	    videoTexture.needsUpdate = true;
+	
+	    root.traverse(obj => {
+		  console.log(obj.type, obj.name);
+	      if (obj.type === 'Mesh' && obj.name === 'Screen') {
+			obj.material.color.setRGB(1, 1, 1);
+	        obj.material.map = videoTexture;
+			//obj.material.emissive.set(1,1,1);
+	        //obj.material.emissiveMap = videoTexture;
+	        obj.material.needsUpdate = true;
+	
+	        console.log('🎥 Video texture applied to:', obj.name);
+	      }
+	    });
+	  });
+	});
 </script>
 
 </body>
