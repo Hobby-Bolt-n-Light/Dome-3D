@@ -280,15 +280,27 @@
 			obj.material.transparent = true;
 			obj.material.needsUpdate = true;
 			
-			// --- world transform ---
-			const worldPos = new THREE.Vector3();
-			const worldQuat = new THREE.Quaternion();
-			
-			obj.getWorldPosition(worldPos);
-			obj.getWorldQuaternion(worldQuat);
 			
 			// --- entity ---
 			const panelEl = document.createElement('a-entity');
+
+			// panelsEl の object3D を親にする
+			panelsEl.object3D.add(panelEl.object3D);
+			
+			// ローカル transform をそのままコピー
+			panelEl.object3D.position.copy(obj.position);
+			panelEl.object3D.quaternion.copy(obj.quaternion);
+			panelEl.object3D.scale.copy(obj.scale);
+			
+			// 元の Mesh を付け替え
+			obj.parent.remove(obj);
+			panelEl.object3D.add(obj);
+			
+			// Mesh 側はリセット
+			obj.position.set(0, 0, 0);
+			obj.rotation.set(0, 0, 0);
+			obj.scale.set(1, 1, 1);
+
 			
 			obj.parent.remove(obj);
 			panelEl.object3D.add(obj);
@@ -303,10 +315,7 @@
 			});*/
 			panelEl.setAttribute('material', { color: 'red', opacity: 0.5 });
 			
-			panelEl.object3D.position.copy(worldPos);
-			panelEl.object3D.quaternion.copy(worldQuat);
 			
-			panelEl.object3D.scale.set(2, 2, 2);
 			
 			obj.rotation.set(0, Math.PI, 0);
 			
@@ -320,7 +329,6 @@
 			panelEl.setAttribute('panel-interaction', { id: obj.name });
 			panelEl.classList.add('clickable');
 			
-			scene.appendChild(panelEl);
 		});
 	});
 
