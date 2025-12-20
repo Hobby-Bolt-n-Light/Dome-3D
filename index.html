@@ -238,36 +238,46 @@
 	        console.log('🎥 Video texture applied to:', obj.name);
 	      }
 	    });
-		root.traverse(obj => {
-		  if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
-			console.log('Panel Found');
-		
-			// 画像割り当て
-			const img = document.getElementById(
-			  obj.name.toLowerCase() + '-img'
-			);
-		
-			obj.material.map = new THREE.Texture(img);
-			obj.material.map.needsUpdate = true;
-			obj.material.transparent = true;
-			obj.material.needsUpdate = true;
-		
-			// A-Frame Entity化（重要）
-			obj.el = document.createElement('a-entity');
-			obj.el.object3D.add(obj);
-		
-			obj.el.setAttribute('float-y', '');
-			obj.el.setAttribute('panel-interaction', {
-			  id: obj.name
-			});
-		
-			scene.appendChild(obj.el);
-		  }
-		});
+		  
 	  });
 
-	  const loading = document.getElementById('loading');
-	  loading.style.display = 'none';
+	  const panelsEl = document.querySelector('a-gltf-model[src="#panels"]');
+
+	  panelsEl.addEventListener('model-loaded', () => {  
+	    const panelsRoot = panelsEl.getObject3D('mesh');
+	    if (!panelsRoot) return;
+		  
+
+		panelsRoot.traverse(obj => {
+		  if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
+		
+		    console.log('Panel Found:', obj.name);
+		
+		    // 画像テクスチャ
+		    const img = document.getElementById(
+		      obj.name.toLowerCase() + '-img'
+		    );
+		
+		    const tex = new THREE.Texture(img);
+		    tex.colorSpace = THREE.SRGBColorSpace;
+		    tex.needsUpdate = true;
+		
+		    obj.material.map = tex;
+		    obj.material.transparent = true;
+		    obj.material.needsUpdate = true;
+		
+		    // ★ フワフワ用の初期値保存
+		    obj.userData.baseY = obj.position.y;
+		    obj.userData.phase = Math.random() * Math.PI * 2;
+		
+		    // ★ クリック用
+		    obj.userData.panelId = obj.name;
+		  }
+	  });
+	});
+
+	const loading = document.getElementById('loading');
+	loading.style.display = 'none';
 	});
 
 	
@@ -353,7 +363,26 @@
 	  Panel6: '説明文6'
 	};
 	
-	//***** フワフワアニメーション *****
+	//***** フワフワ上下アニメーション *****
+	AFRAME.registerComponent('float-y', {
+	  schema: {
+	    amplitude: { default: 0.05 }, // 揺れ幅
+	    speed: { default: 1 }         // 揺れ速度
+	  },
+	
+	  init() {
+	    this.startY = this.el.object3D.position.y;
+	    this.time = 0;
+	  },
+	
+	  tick(time, delta) {
+	    this.time += delta / 1000;
+	    this.el.object3D.position.y =
+	      this.startY +
+	      Math.sin(this.time * this.data.speed) * this.data.amplitude;
+	  }
+	});
+
 	AFRAME.registerComponent('panel-interaction', {
 	  schema: { id: { type: 'string' } },
 	
