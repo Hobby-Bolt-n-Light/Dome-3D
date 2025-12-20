@@ -179,7 +179,8 @@
 			  look-controls
 			  raycaster="objects: .clickable"
 			  cursor="rayOrigin: entity"
-			  near="0.002">
+			  near="0.05"
+			  far="50">
 			</a-camera>//rayOrigin: Mouse
 	</a-entity>
 	
@@ -294,8 +295,8 @@
 			
 			panelEl.setAttribute('geometry', {
 				primitive: 'plane',
-				width: 1,
-				height: 1
+				width: 0.05,
+				height: 0.05
 			});
 			panelEl.setAttribute('material', {
 				opacity: 0,
@@ -311,6 +312,9 @@
 			
 			obj.position.set(0, 0, 0);
 			obj.rotation.set(0, 0, 0);
+			
+			obj.userData.panelId = obj.name;
+			obj.frustumCulled = false;
 			
 			panelEl.setAttribute('float-y', '');
 			panelEl.setAttribute('panel-interaction', { id: obj.name });
@@ -443,15 +447,15 @@
 	});
 
 	AFRAME.registerComponent('panel-interaction', {
-	  schema: { id: { type: 'string' } },
-	
 	  init() {
 	    this.el.addEventListener('click', () => {
-			console.log('panel Clicked');
-	      const info = document.getElementById('panelInfo');
+		  console.log('Panel Clicked');
+	      const mesh = this.el.object3D.children[0];
+	      if (!mesh || !mesh.userData.panelId) return;
+	
 	      document.getElementById('panelText').innerHTML =
-	        panelTexts[this.data.id];
-	      info.style.display = 'block';
+	        panelTexts[mesh.userData.panelId];
+	      document.getElementById('panelInfo').style.display = 'block';
 	    });
 	  }
 	});
