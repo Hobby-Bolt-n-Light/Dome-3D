@@ -173,7 +173,7 @@ scene.addEventListener('loaded', () => {
       if (obj.type === 'Mesh' && obj.name === 'Screen') {
 		obj.material.color.setRGB(1, 1, 1);   // ← 重要
         obj.material.map = videoTexture;
-		obj.material.emissive.set(3,3,3);
+		obj.material.emissive.set(1,1,1);
         obj.material.emissiveMap = videoTexture;
         obj.material.needsUpdate = true;
 
