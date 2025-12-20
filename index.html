@@ -128,24 +128,70 @@
 
 <script>
 	
-//***** 移動範囲制限 *****
-/*
-  const rig = document.getElementById('rig');
-  const radius = 1.5; // 円形移動範囲
+	
+	const scene = document.getElementById('scene');
+	
+	//***** 案内表示 *****
+	const intro = document.getElementById('intro');
+	intro.addEventListener('click', () => {
+	  intro.style.display = 'none';
+	  document.getElementById('movie').play();
+	  document.getElementById('movie_main3').play();
+	});
+		
+	//***** 動画再生 *****
+	document.body.addEventListener('click', () => {
+	  document.getElementById('movie').play();
+	  document.getElementById('movie_main3').play();
+	}, { once: true });
+	
+	
+	scene.addEventListener('loaded', () => {
+	  const model = document.querySelector('[gltf-model]');
+	
+	  model.addEventListener('model-loaded', () => {
+	    const root = model.getObject3D('mesh');
+	    const video = document.getElementById('movie_main3');
+	
+	    const videoTexture = new AFRAME.THREE.VideoTexture(video);
+	    videoTexture.flipY = false;
+	    videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
+	    videoTexture.needsUpdate = true;
+	
+	    root.traverse(obj => {
+		  console.log(obj.type, obj.name);
+	      if (obj.type === 'Mesh' && obj.name === 'Screen') {
+			obj.material.color.setRGB(1, 1, 1);
+	        obj.material.map = videoTexture;
+			//obj.material.emissive.set(1,1,1);
+	        //obj.material.emissiveMap = videoTexture;
+	        obj.material.needsUpdate = true;
+	
+	        console.log('🎥 Video texture applied to:', obj.name);
+	      }
+	    });
+	  });
+	});
 
-  function move(dx, dz) {
-    const pos = rig.object3D.position;
-    pos.x += dx;
-    pos.z += dz;
-
-    // 円形制限
-    const dist = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
-    if (dist > radius) {
-      pos.x *= radius / dist;
-      pos.z *= radius / dist;
-    }
-  }
-*/
+	
+	//***** 移動範囲制限 *****
+	/*
+	  const rig = document.getElementById('rig');
+	  const radius = 1.5; // 円形移動範囲
+	
+	  function move(dx, dz) {
+	    const pos = rig.object3D.position;
+	    pos.x += dx;
+	    pos.z += dz;
+	
+	    // 円形制限
+	    const dist = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
+	    if (dist > radius) {
+	      pos.x *= radius / dist;
+	      pos.z *= radius / dist;
+	    }
+	  }
+	*/
 
 	const rig = document.getElementById('rig');
 	const camera = rig.querySelector('a-camera');
@@ -192,50 +238,6 @@
 	
 	scene.addEventListener('loaded', () => {
 	  scene.addEventListener('tick', tick);
-	});
-
-	
-	//***** 案内表示 *****
-	const intro = document.getElementById('intro');
-	intro.addEventListener('click', () => {
-	  intro.style.display = 'none';
-	  document.getElementById('movie').play();
-	  document.getElementById('movie_main3').play();
-	});
-		
-	//***** 動画再生 *****
-	document.body.addEventListener('click', () => {
-	  document.getElementById('movie').play();
-	  document.getElementById('movie_main3').play();
-	}, { once: true });
-	
-	const scene = document.getElementById('scene');
-	
-	scene.addEventListener('loaded', () => {
-	  const model = document.querySelector('[gltf-model]');
-	
-	  model.addEventListener('model-loaded', () => {
-	    const root = model.getObject3D('mesh');
-	    const video = document.getElementById('movie_main3');
-	
-	    const videoTexture = new AFRAME.THREE.VideoTexture(video);
-	    videoTexture.flipY = false;
-	    videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
-	    videoTexture.needsUpdate = true;
-	
-	    root.traverse(obj => {
-		  console.log(obj.type, obj.name);
-	      if (obj.type === 'Mesh' && obj.name === 'Screen') {
-			obj.material.color.setRGB(1, 1, 1);
-	        obj.material.map = videoTexture;
-			//obj.material.emissive.set(1,1,1);
-	        //obj.material.emissiveMap = videoTexture;
-	        obj.material.needsUpdate = true;
-	
-	        console.log('🎥 Video texture applied to:', obj.name);
-	      }
-	    });
-	  });
 	});
 </script>
 
