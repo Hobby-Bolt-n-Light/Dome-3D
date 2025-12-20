@@ -280,6 +280,23 @@
 	loading.style.display = 'none';
 	});
 
+	scene.addEventListener('click', (evt) => {
+	  const intersected = evt.detail.intersectedEl;
+	  if (!intersected) return;
+	
+	  const mesh = intersected.getObject3D('mesh');
+	  if (!mesh) return;
+	
+	  mesh.traverse(obj => {
+	    if (obj.userData.panelId) {
+	      document.getElementById('panelText').innerHTML =
+	        panelTexts[obj.userData.panelId];
+	      document.getElementById('panelInfo').style.display = 'block';
+	    }
+	  });
+	});
+
+
 	
 	//***** 移動範囲制限 *****
 	/*
