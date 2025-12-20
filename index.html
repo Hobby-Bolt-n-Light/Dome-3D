@@ -45,7 +45,20 @@
 	  justify-content: center;
 	  text-align: center;
 	  z-index: 20;
-	  font-size: 18px;
+	  font-size: 3vmin;
+	}
+	  
+	#loading {
+	  position: fixed;
+	  inset: 0;
+	  background: rgba(0,0.1,0.2,1);
+	  color: white;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  text-align: center;
+	  z-index: 30;
+	  font-size: 3vmin;
 	}
   </style>
 </head>
@@ -69,6 +82,9 @@
 
 
 <!-- 案内表示 -->
+<div id="loading">
+	読み込み中…
+</div>
 <div id="intro">
 	<p>画面をドラッグして視点を移動できます<br>
 	 ボタンで移動できます<br>
@@ -110,6 +126,13 @@
     position="0 2 -4"
     width="3"
     height="1.7"
+    material="src: #movie_main3">
+  </a-plane>
+	
+  <a-plane
+    position="0 0 1"
+    width="0.5"
+    height="0.281"
     material="src: #movie_main3">
   </a-plane>
 
