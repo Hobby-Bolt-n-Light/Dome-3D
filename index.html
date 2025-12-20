@@ -82,10 +82,10 @@
 	<button onclick="move(0.3, 0)">→</button>
 	<button onclick="move(0, 0.3)">↓</button> 
 	-->
-	<button onmousedown="startMove(0, -1)" onmouseup="stopMove()">↑</button>
-	<button onmousedown="startMove(-1, 0)" onmouseup="stopMove()">←</button>
-	<button onmousedown="startMove(1, 0)" onmouseup="stopMove()">→</button>
-	<button onmousedown="startMove(0, 1)" onmouseup="stopMove()">↓</button>
+	<button onmousedown="startMove(0, -1)" onmouseup="stopMove()" ontouchstart="startMove(0, -1)" ontouchend="stopMove()">↑</button>
+	<button onmousedown="startMove(-1, 0)" onmouseup="stopMove()" ontouchstart="startMove(-1, 0)" ontouchend="stopMove()">←</button>
+	<button onmousedown="startMove(1, 0)" onmouseup="stopMove()" ontouchstart="startMove(1, 0)" ontouchend="stopMove()">→</button>
+	<button onmousedown="startMove(0, 1)" onmouseup="stopMove()" ontouchstart="startMove(0, 1)" ontouchend="stopMove()">↓</button>
 </div>
 
 
@@ -133,11 +133,11 @@
   <!-- 動画スクリーン -->
   <a-plane
     position="1.5 0.5 0"
-	rotation="0 180 0"
+	rotation="0 90 0"
     width="0.5"
     height="0.281"
     material="src: #movie_main3">
-	  <material side="double"></material>
+	<material side="double"></material>
   </a-plane>
 
   <a-octahedron position="0 0 0" color="blue" scale="0.1 0.1 0.1"></a-octahedron>
