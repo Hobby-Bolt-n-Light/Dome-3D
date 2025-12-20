@@ -201,17 +201,21 @@
 	let moving = false;
 	
 	function startMove(x, z) {
+	  console.log('startMove:', x, z);
 	  moveVec.x = x;
 	  moveVec.z = z;
 	  moving = true;
 	}
 	
 	function stopMove() {
+	  console.log('stopMove');
 	  moving = false;
 	}
 	
 	function tick() {
 	  if (!moving) return;
+	  
+	  console.log('tick:');
 	
 	  const camObj = camera.object3D;
 	  const dir = new AFRAME.THREE.Vector3();
