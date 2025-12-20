@@ -179,7 +179,7 @@
 			  look-controls
 			  raycaster="objects: .clickable"
 			  cursor="rayOrigin: entity"
-			  near="0.01">
+			  near="0.002">
 			</a-camera>//rayOrigin: Mouse
 	</a-entity>
 	
@@ -447,6 +447,7 @@
 	
 	  init() {
 	    this.el.addEventListener('click', () => {
+			console.log('panel Clicked');
 	      const info = document.getElementById('panelInfo');
 	      document.getElementById('panelText').innerHTML =
 	        panelTexts[this.data.id];
