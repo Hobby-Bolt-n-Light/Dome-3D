@@ -247,39 +247,53 @@
 	    const panelsRoot = panelsEl.getObject3D('mesh');
 	    if (!panelsRoot) return;
 		  
-
 		panelsRoot.traverse(obj => {
-		  if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
-		
-		    console.log('Panel Found:', obj.name);
-		
-		    // 画像テクスチャ
-		    const img = document.getElementById(
-		      obj.name.toLowerCase() + '-img'
-		    );
-		
-		    const tex = new THREE.Texture(img);
-		    tex.colorSpace = THREE.SRGBColorSpace;
-		    tex.needsUpdate = true;
-		
-		    obj.material.map = tex;
-		    obj.material.transparent = true;
-		    obj.material.needsUpdate = true;
-		
-		    // ★ フワフワ用の初期値保存
-		    obj.userData.baseY = obj.position.y;
-		    obj.userData.phase = Math.random() * Math.PI * 2;
-		
-		    // ★ クリック用
-		    obj.userData.panelId = obj.name;
-		  }
-	  });
+			if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
+			
+			    console.log('Panel Found:', obj.name);
+			
+			    // 画像テクスチャ
+			    const img = document.getElementById(
+			      obj.name.toLowerCase() + '-img'
+			    );
+			
+			    const tex = new THREE.Texture(img);
+			    tex.colorSpace = THREE.SRGBColorSpace;
+			    tex.needsUpdate = true;
+			
+			    obj.material.map = tex;
+			    obj.material.transparent = true;
+			    obj.material.needsUpdate = true;
+			
+			    // ===== ★ここが核心 =====
+			
+			    // A-Frame Entity を作る
+			    const panelEl = document.createElement('a-entity');
+			
+			    // Panel Mesh を entity に移す
+			    panelEl.object3D.add(obj);
+			
+			    // 元の親からは外す
+			    panelsRoot.remove(obj);
+			
+			    // コンポーネント付与
+			    panelEl.setAttribute('float-y', '');
+			    panelEl.setAttribute('panel-interaction', {
+			      id: obj.name
+			    });
+			
+			    // Scene に追加
+			    scene.appendChild(panelEl);
+			  }
+		});
+
 	});
 
 	const loading = document.getElementById('loading');
 	loading.style.display = 'none';
 	});
 
+	/*
 	scene.addEventListener('click', (evt) => {
 	  const intersected = evt.detail.intersectedEl;
 	  if (!intersected) return;
@@ -294,7 +308,7 @@
 	      document.getElementById('panelInfo').style.display = 'block';
 	    }
 	  });
-	});
+	});*/
 
 
 	
