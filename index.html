@@ -217,8 +217,34 @@
 	
 	//***** 動画貼り付け　＋　画像貼り付け *****
 	const screenEl = document.querySelector('a-gltf-model[src="#screen"]');
+	screenEl.addEventListener('model-loaded', () => {
+		const root = screenEl.getObject3D('mesh');
+		if (!root) return;
+		const video = document.getElementById('movie_main3');
+		
+		const videoTexture = new AFRAME.THREE.VideoTexture(video);
+		videoTexture.flipY = false;
+		videoTexture.colorSpace = AFRAME.THREE.SRGBColorSpace;
+		videoTexture.needsUpdate = true;
+		
+		root.traverse(obj => {
+			console.log(obj.type, obj.name);
+			if (obj.type === 'Mesh' && obj.name === 'Screen') {
+				console.log('Screen Found');
+				obj.material.color.setRGB(1, 1, 1);
+				obj.material.map = videoTexture;
+				//obj.material.emissive.set(1,1,1);
+				//obj.material.emissiveMap = videoTexture;
+				obj.material.needsUpdate = true;
+				
+				console.log('🎥 Video texture applied to:', obj.name);
+			}
+		});
+	});
+	
 	scene.addEventListener('loaded', () => {
 		console.log('Data loaded');
+		/*
 		const model = document.querySelector('[gltf-model]');
 		
 		model.addEventListener('model-loaded', () => {
@@ -244,7 +270,7 @@
 				}
 			});
 		  
-		});
+		});*/
 		
 
 		const loading = document.getElementById('loading');
