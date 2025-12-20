@@ -292,17 +292,16 @@
 			
 			obj.parent.remove(obj);
 			panelEl.object3D.add(obj);
-			/*
 			panelEl.setAttribute('geometry', {
-				primitive: 'plane',
-				width: 1.0,
-				height: 1.0
-			});
+			  primitive: 'plane',
+			  width: 0.5,
+			  height: 0.5
+			});/*
 			panelEl.setAttribute('material', {
-				opacity: 0,
-				transparent: true
-			});
-			*/
+			  opacity: 0.001,   // ← 完全 0 は避ける
+			  transparent: true
+			});*/
+			panelEl.setAttribute('material', { color: 'red', opacity: 0.5 });
 			
 			panelEl.object3D.position.copy(worldPos);
 			panelEl.object3D.quaternion.copy(worldQuat);
