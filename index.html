@@ -159,6 +159,7 @@
 	
 	
   <!-- 動画スクリーン -->
+	<!--
   <a-plane
     position="1.5 0.5 0"
 	rotation="0 90 0"
@@ -167,6 +168,7 @@
     material="src: #movie_main3">
 	<material side="double"></material>
   </a-plane>
+	-->
 
   <!--<a-octahedron position="0 0 0" color="blue" scale="0.1 0.1 0.1"></a-octahedron>-->
 
@@ -237,8 +239,6 @@
 				console.log('Screen Found');
 				obj.material.color.setRGB(1, 1, 1);
 				obj.material.map = videoTexture;
-				//obj.material.emissive.set(1,1,1);
-				//obj.material.emissiveMap = videoTexture;
 				obj.material.needsUpdate = true;
 				
 				console.log('🎥 Video texture applied to:', obj.name);
