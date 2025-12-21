@@ -280,54 +280,42 @@
 			obj.material.transparent = true;
 			obj.material.needsUpdate = true;
 			
-			
 			// --- entity ---
 			const panelEl = document.createElement('a-entity');
-
-			// panelsEl の object3D を親にする
 			panelsEl.object3D.add(panelEl.object3D);
 			
-			// ローカル transform をそのままコピー
+			// transform 継承
 			panelEl.object3D.position.copy(obj.position);
 			panelEl.object3D.quaternion.copy(obj.quaternion);
 			panelEl.object3D.scale.copy(obj.scale);
 			
-			// 元の Mesh を付け替え
+			// Mesh を移動
 			obj.parent.remove(obj);
 			panelEl.object3D.add(obj);
 			
-			// Mesh 側はリセット
+			// Mesh リセット
 			obj.position.set(0, 0, 0);
 			obj.rotation.set(0, 0, 0);
 			obj.scale.set(1, 1, 1);
-
 			
-			obj.parent.remove(obj);
-			panelEl.object3D.add(obj);
+			// ID は entity に持たせる
+			panelEl.userData = { panelId: obj.name };
+			
+			// クリック用 Plane
 			panelEl.setAttribute('geometry', {
 			  primitive: 'plane',
 			  width: 0.5,
 			  height: 0.5
-			});/*
+			});
 			panelEl.setAttribute('material', {
-			  opacity: 0.001,   // ← 完全 0 は避ける
+			  opacity: 0.001,
 			  transparent: true
-			});*/
-			panelEl.setAttribute('material', { color: 'red', opacity: 0.5 });
+			});
 			
-			
-			
-			obj.rotation.set(0, Math.PI, 0);
-			
-			obj.position.set(0, 0, 0);
-			obj.rotation.set(0, 0, 0);
-			
-			obj.userData.panelId = obj.name;
-			obj.frustumCulled = false;
-			
-			panelEl.setAttribute('float-y', '');
-			panelEl.setAttribute('panel-interaction', { id: obj.name });
 			panelEl.classList.add('clickable');
+			panelEl.setAttribute('float-y', '');
+			panelEl.setAttribute('panel-interaction', '');
+
 			
 		});
 	});
