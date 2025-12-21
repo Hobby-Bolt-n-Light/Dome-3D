@@ -78,20 +78,6 @@
 	<button onmousedown="startMove(-1, 0)" onmouseup="stopMove()" ontouchstart="startMove(-1, 0)" ontouchend="stopMove()">→</button>
 	<button onmousedown="startMove(0, -1)" onmouseup="stopMove()" ontouchstart="startMove(0, -1)" ontouchend="stopMove()">↓</button>
 </div>
-<div id="panelInfo" style="
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  color: white;
-  display: none;
-  z-index: 40;
-  padding: 5vmin;
-">
-  <button onclick="closeInfo()" style="position:absolute;top:20px;left:20px;">
-    ← 戻る
-  </button>
-  <div id="panelText"></div>
-</div>
 
 
 
@@ -117,14 +103,6 @@
     <a-asset-item id="panels" src="assets/BOD_v1_Panels.glb"></a-asset-item>
 
 	<!-- 画像データ -->
-	<!--
-	<img id="panel1-img" src="assets/panel1.jpg">
-	<img id="panel2-img" src="assets/panel2.jpg">
-	<img id="panel3-img" src="assets/panel3.jpg">
-	<img id="panel4-img" src="assets/panel4.jpg">
-	<img id="panel5-img" src="assets/panel5.jpg">
-	<img id="panel6-img" src="assets/panel6.jpg">
-	  -->
 
   </a-assets>
 
@@ -247,131 +225,10 @@
 		});
 	});
 	
-	/*
-	const panelsEl = document.querySelector('a-gltf-model[src="#panels"]');
-	panelsEl.addEventListener('model-loaded', () => {
-		console.log('panels loaded');
-		
-		const panelsRoot = panelsEl.getObject3D('mesh');
-		if (!panelsRoot) return;
-		
-		// ★ ① Panel を一旦集める
-		const panelMeshes = [];
-		
-		panelsRoot.traverse(obj => {
-			console.log(obj.type, obj.name);
-			if (obj.type === 'Mesh' && obj.name.startsWith('Panel')) {
-				panelMeshes.push(obj);
-			}
-		});
-		
-		console.log('Collected panels:', panelMeshes.map(p => p.name));
-		
-		// ★ ② traverse 後に処理
-		panelMeshes.forEach(obj => {
-		
-			console.log('Process panel:', obj.name);
-			
-			// --- texture ---
-			const img = document.getElementById(
-				obj.name.toLowerCase() + '-img'
-			);
-			
-			const tex = new THREE.Texture(img);
-			tex.colorSpace = THREE.SRGBColorSpace;
-			tex.needsUpdate = true;
-			
-			obj.material.map = tex;
-			obj.material.transparent = true;
-			obj.material.needsUpdate = true;
-			
-			// --- entity ---
-			const panelEl = document.createElement('a-entity');
-			//panelsEl.object3D.add(panelEl.object3D);
-			panelsEl.appendChild(panelEl); // ← 必須
-			
-			// transform 継承
-			panelEl.object3D.position.copy(obj.position);
-			panelEl.object3D.quaternion.copy(obj.quaternion);
-			panelEl.object3D.scale.copy(obj.scale);
-			
-			// Mesh を移動
-			obj.parent.remove(obj);
-			panelEl.object3D.add(obj);
-			
-			// Mesh リセット
-			obj.position.set(0, 0, 0);
-			obj.rotation.set(0, 0, 0);
-			obj.scale.set(1, 1, 1);
-			
-			// ID は entity に持たせる
-			panelEl.userData = { panelId: obj.name };
-			
-			// クリック用 Plane
-			panelEl.setAttribute('geometry', {
-			  primitive: 'plane',
-			  width: 1.0,
-			  height: 1.0
-			});
-			/*
-			panelEl.setAttribute('material', {
-			  opacity: 0.001,
-			  transparent: true
-			});///
-			panelEl.setAttribute('material', {
-			  color: 'red',
-			  opacity: 0.5,
-			  side: 'double'
-			});
-			
-			panelEl.object3D.position.z += 0.01;
-			
-			panelEl.classList.add('clickable');
-			panelEl.setAttribute('float-y', '');
-			panelEl.setAttribute('panel-interaction', '');
-
-			
-		});
-	});*/
-
-
-	/*
-	scene.addEventListener('click', (evt) => {
-	  const intersected = evt.detail.intersectedEl;
-	  if (!intersected) return;
-	
-	  const mesh = intersected.getObject3D('mesh');
-	  if (!mesh) return;
-	
-	  mesh.traverse(obj => {
-	    if (obj.userData.panelId) {
-	      document.getElementById('panelText').innerHTML =
-	        panelTexts[obj.userData.panelId];
-	      document.getElementById('panelInfo').style.display = 'block';
-	    }
-	  });
-	});*/
 
 
 	
 	//***** 移動範囲制限 *****
-	/*
-	  const rig = document.getElementById('rig');
-	  const radius = 1.5; // 円形移動範囲
-	
-	  function move(dx, dz) {
-	    const pos = rig.object3D.position;
-	    pos.x += dx;
-	    pos.z += dz;
-	
-	    // 円形制限
-	    const dist = Math.sqrt(pos.x * pos.x + pos.z * pos.z);
-	    if (dist > radius) {
-	      pos.x *= radius / dist;
-	      pos.z *= radius / dist;
-	    }
-	  }
-	*/
 	AFRAME.registerComponent('relative-move', {
 	  schema: {
 	    speed: { default: 0.005 },
@@ -436,45 +293,6 @@
 	  Panel6: '説明文6'
 	};
 	
-	//***** フワフワ上下アニメーション *****
-	/*
-	AFRAME.registerComponent('float-y', {
-	  schema: {
-	    amplitude: { default: 0.05 }, // 揺れ幅
-	    speed: { default: 1 }         // 揺れ速度
-	  },
-	
-	  init() {
-	    this.startY = this.el.object3D.position.y;
-	    this.time = 0;
-	  },
-	
-	  tick(time, delta) {
-	    this.time += delta / 1000;
-	    this.el.object3D.position.y =
-	      this.startY +
-	      Math.sin(this.time * this.data.speed) * this.data.amplitude;
-	  }
-	});
-	
-	AFRAME.registerComponent('panel-interaction', {
-	  init() {
-	    this.el.addEventListener('click', () => {
-	      console.log('Panel Clicked');
-	
-	      const id = this.el.userData.panelId;
-	      if (!id) return;
-	
-	      document.getElementById('panelText').innerHTML =
-	        panelTexts[id];
-	      document.getElementById('panelInfo').style.display = 'block';
-	    });
-	  }
-	});
-	
-	function closeInfo() {
-	  document.getElementById('panelInfo').style.display = 'none';
-	}*/
 	
 </script>
 
