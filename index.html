@@ -129,14 +129,17 @@
   <a-sky src="#sky" rotation="0 -90 0"></a-sky>
 
   <!-- 空間モデル -->
-	
+
+  <!--
   <a-gltf-model
     src="#panels"
     position="0 0 0"
 	rotation="0 -90 0"
     scale="2 2 2">
   </a-gltf-model>
-	
+	-->
+
+
   <a-gltf-model
     src="#screen"
     position="0 0 0"
@@ -242,7 +245,7 @@
 		});
 	});
 	
-
+	
 	const panelsEl = document.querySelector('a-gltf-model[src="#panels"]');
 	panelsEl.addEventListener('model-loaded', () => {
 		console.log('panels loaded');
