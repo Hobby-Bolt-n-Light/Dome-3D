@@ -282,7 +282,8 @@
 			
 			// --- entity ---
 			const panelEl = document.createElement('a-entity');
-			panelsEl.object3D.add(panelEl.object3D);
+			//panelsEl.object3D.add(panelEl.object3D);
+			panelsEl.appendChild(panelEl); // ← 必須
 			
 			// transform 継承
 			panelEl.object3D.position.copy(obj.position);
