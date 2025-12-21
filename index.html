@@ -312,7 +312,13 @@
 			  opacity: 0.001,
 			  transparent: true
 			});*/
-			panelEl.setAttribute('material', { color: 'red', opacity: 0.5 });
+			panelEl.setAttribute('material', {
+			  color: 'red',
+			  opacity: 0.5,
+			  side: 'double'
+			});
+			
+			panelEl.object3D.position.z += 0.01;
 			
 			panelEl.classList.add('clickable');
 			panelEl.setAttribute('float-y', '');
@@ -443,16 +449,17 @@
 	      Math.sin(this.time * this.data.speed) * this.data.amplitude;
 	  }
 	});
-
+	
 	AFRAME.registerComponent('panel-interaction', {
 	  init() {
 	    this.el.addEventListener('click', () => {
-		  console.log('Panel Clicked');
-	      const mesh = this.el.object3D.children[0];
-	      if (!mesh || !mesh.userData.panelId) return;
+	      console.log('Panel Clicked');
+	
+	      const id = this.el.userData.panelId;
+	      if (!id) return;
 	
 	      document.getElementById('panelText').innerHTML =
-	        panelTexts[mesh.userData.panelId];
+	        panelTexts[id];
 	      document.getElementById('panelInfo').style.display = 'block';
 	    });
 	  }
